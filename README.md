@@ -61,3 +61,18 @@ This will:
 5. Generate and save a plot (`<TICKER_SYMBOL>_Hmm_Trading_Analysis.png`) showing the stock's closing price with the identified HMM states overlaid, and a separate plot of the hidden state sequence.
 
 You can modify `TickerSymbol`, `StartDate`, `EndDate`, and `NumberOfHiddenStates` in `Main.py` to experiment with different stocks, time periods, and model configurations.
+
+## Running the Streamlit Application
+
+To run the interactive Streamlit application:
+
+1. Ensure you have all necessary dependencies installed:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Navigate to the root directory of the project in your terminal.
+3. Run the following command:
+   ```bash
+   streamlit run StreamlitApp.py
+   ```
+This will open the application in your web browser.
