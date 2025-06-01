@@ -3,3 +3,4 @@ hmmlearn
 numpy
 pandas
 matplotlib
+streamlit
