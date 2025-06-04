@@ -16,7 +16,7 @@ class MarketRegimeHmm:
 
     def PredictRegimes(self, Observations: np.ndarray) -> list[str]:
         HiddenStates = self.Model.predict(Observations)
-        Means = self.Model.means_.flatten()
+        Means = self.Model.means_.mean(axis=1)
         Order = np.argsort(Means)
         LabelMapping = {Order[2]: "Uptrend", Order[0]: "Downtrend", Order[1]: "Sideway"}
         return [LabelMapping[State] for State in HiddenStates]
