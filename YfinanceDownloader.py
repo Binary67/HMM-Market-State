@@ -17,8 +17,9 @@ import pandas_ta as ta
 def DownloadTradingData(TickerSymbol: str, StartDate: str, EndDate: str, Interval: str) -> pd.DataFrame:
     """Download trading data from Yahoo Finance and return a flat DataFrame.
 
-    The DataFrame includes Moving Averages, RSI, ATR, Stochastic oscillator and
-    On Balance Volume for richer HMM observations.
+    The DataFrame includes Moving Averages, Bollinger Bands, MACD, EMA, RSI,
+    ATR, Stochastic oscillator and On Balance Volume for richer HMM
+    observations.
     """
     Data = yf.download(tickers=TickerSymbol, start=StartDate, end=EndDate, interval=Interval)
     if isinstance(Data.columns, pd.MultiIndex):
@@ -35,6 +36,21 @@ def DownloadTradingData(TickerSymbol: str, StartDate: str, EndDate: str, Interva
 
     Data["MA20"] = ta.sma(Data[CloseColumn], length=20)
     Data["MA50"] = ta.sma(Data[CloseColumn], length=50)
+    Bollinger = ta.bbands(Data[CloseColumn], length=20)
+    if isinstance(Bollinger, pd.DataFrame):
+        Data["BBL"] = Bollinger.iloc[:, 0]
+        Data["BBM"] = Bollinger.iloc[:, 1]
+        Data["BBU"] = Bollinger.iloc[:, 2]
+    else:
+        Data["BBL"] = np.nan
+        Data["BBM"] = np.nan
+        Data["BBU"] = np.nan
+    Macd = ta.macd(Data[CloseColumn])
+    if isinstance(Macd, pd.DataFrame):
+        Data["MACD"] = Macd.iloc[:, 0]
+    else:
+        Data["MACD"] = Macd
+    Data["EMA20"] = ta.ema(Data[CloseColumn], length=20)
     Data["RSI"] = ta.rsi(Data[CloseColumn], length=14)
     Data["ATR14"] = ta.atr(Data[HighColumn], Data[LowColumn], Data[CloseColumn], length=14)
     Stoch = ta.stoch(Data[HighColumn], Data[LowColumn], Data[CloseColumn], k=14)
