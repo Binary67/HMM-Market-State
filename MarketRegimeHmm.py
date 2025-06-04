@@ -1,5 +1,6 @@
 import numpy as np
 from hmmlearn.hmm import GaussianHMM
+from ObservationsHelper import StandardizeObservations
 
 
 class MarketRegimeHmm:
@@ -9,7 +10,8 @@ class MarketRegimeHmm:
         self.Model = GaussianHMM(n_components=StateCount, covariance_type="diag", n_iter=1000)
 
     def Fit(self, Observations: np.ndarray) -> None:
-        self.Model.fit(Observations)
+        StandardizedObservations = StandardizeObservations(Observations)
+        self.Model.fit(StandardizedObservations)
 
     def PredictStates(self, Observations: np.ndarray) -> np.ndarray:
         return self.Model.predict(Observations)
