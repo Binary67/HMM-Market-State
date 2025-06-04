@@ -1,5 +1,6 @@
 from YfinanceDownloader import DownloadTradingData
 from MarketRegimeHmm import MarketRegimeHmm
+from RegimeAccuracyChecker import RegimeAccuracyChecker
 
 
 def Main() -> 'pd.DataFrame':
@@ -13,6 +14,9 @@ def Main() -> 'pd.DataFrame':
     Regimes = HmmModel.PredictRegimes(Observations)
     Result = Data.loc[Data[FeatureColumns].dropna().index].copy()
     Result["Regime"] = Regimes
+    AccuracyChecker = RegimeAccuracyChecker()
+    Accuracy = AccuracyChecker.CalculateAccuracy(Result, "Regime", "Return")
+    print(f"Prediction accuracy: {Accuracy:.2%}")
     return Result
 
 
