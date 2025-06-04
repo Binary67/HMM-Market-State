@@ -29,6 +29,7 @@ In our case:
 - 📊 **Real-time market data processing**
 - 🧠 **HMM model training and prediction**
 - 📈 **Visualization of market states and predictions**
+- 📈 **Technical indicators including Moving Averages, RSI, ATR, Stochastic and OBV**
 - 📱 **Easy-to-use interface**
 - 🔄 **Automatic model retraining**
 - 📊 **Performance metrics and backtesting**
