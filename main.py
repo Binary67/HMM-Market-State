@@ -22,4 +22,3 @@ def Main() -> 'pd.DataFrame':
 
 if __name__ == "__main__":
     ResultData = Main()
-    print(ResultData.head())

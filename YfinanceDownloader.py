@@ -3,6 +3,7 @@ import pandas_ta as ta
 import yfinance as yf
 
 
+
 def DownloadTradingData(TickerSymbol: str, StartDate: str, EndDate: str, Interval: str) -> pd.DataFrame:
     """Download trading data from Yahoo Finance and return a flat DataFrame.
 
