@@ -1,5 +1,5 @@
 from YfinanceDownloader import DownloadTradingData
-from MarketRegineHmm import MarketRegineHmm
+from MarketRegimeHmm import MarketRegimeHmm
 
 
 def Main() -> 'pd.DataFrame':
@@ -8,7 +8,7 @@ def Main() -> 'pd.DataFrame':
     Data["Return"] = Data[CloseColumn].pct_change()
     FeatureColumns = ["Return", "MA20", "MA50", "RSI"]
     Observations = Data[FeatureColumns].dropna().values
-    HmmModel = MarketRegineHmm()
+    HmmModel = MarketRegimeHmm()
     HmmModel.Fit(Observations)
     Regimes = HmmModel.PredictRegimes(Observations)
     Result = Data.loc[Data[FeatureColumns].dropna().index].copy()
