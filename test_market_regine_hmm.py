@@ -1,19 +1,14 @@
+import pandas as pd
 from YfinanceDownloader import DownloadTradingData
 from MarketRegineHmm import MarketRegineHmm
 
 
-def Main() -> 'pd.DataFrame':
-    Data = DownloadTradingData("AAPL", "2021-01-01", "2021-03-01", "1d")
+def test_market_regine_hmm_predicts_labels():
+    Data = DownloadTradingData("AAPL", "2021-01-01", "2021-01-15", "1d")
     CloseColumn = [Column for Column in Data.columns if Column.startswith("Close")][0]
     Observations = Data[CloseColumn].pct_change().dropna().values.reshape(-1, 1)
     HmmModel = MarketRegineHmm()
     HmmModel.Fit(Observations)
-    Regimes = HmmModel.PredictRegimes(Observations)
-    Result = Data.iloc[1:].copy()
-    Result["Regime"] = Regimes
-    return Result
-
-
-if __name__ == "__main__":
-    ResultData = Main()
-    print(ResultData.head())
+    Labels = HmmModel.PredictRegimes(Observations)
+    assert len(Labels) == len(Observations)
+    assert set(Labels).issubset({"Uptrend", "Downtrend", "Sideway"})
