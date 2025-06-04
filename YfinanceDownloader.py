@@ -1,4 +1,5 @@
 import pandas as pd
+import pandas_ta as ta
 import yfinance as yf
 
 
@@ -17,33 +18,15 @@ def DownloadTradingData(TickerSymbol: str, StartDate: str, EndDate: str, Interva
         Data = Data.reset_index()
 
     CloseColumn = [Column for Column in Data.columns if Column.startswith("Close")][0]
-    Data["MA20"] = Data[CloseColumn].rolling(window=20, min_periods=1).mean()
-    Data["MA50"] = Data[CloseColumn].rolling(window=50, min_periods=1).mean()
-    Delta = Data[CloseColumn].diff()
-    Up = Delta.clip(lower=0)
-    Down = -1 * Delta.clip(upper=0)
-    RollUp = Up.rolling(window=14, min_periods=1).mean()
-    RollDown = Down.rolling(window=14, min_periods=1).mean()
-    Rs = RollUp / RollDown
-    Data["RSI"] = 100.0 - (100.0 / (1.0 + Rs))
-
     HighColumn = [Column for Column in Data.columns if Column.startswith("High")][0]
     LowColumn = [Column for Column in Data.columns if Column.startswith("Low")][0]
     VolumeColumn = [Column for Column in Data.columns if Column.startswith("Volume")][0]
-    PrevClose = Data[CloseColumn].shift(1)
-    HighLow = Data[HighColumn] - Data[LowColumn]
-    HighPrevClose = (Data[HighColumn] - PrevClose).abs()
-    LowPrevClose = (Data[LowColumn] - PrevClose).abs()
-    TrueRange = pd.concat([HighLow, HighPrevClose, LowPrevClose], axis=1).max(axis=1)
-    Data["ATR14"] = TrueRange.rolling(window=14, min_periods=1).mean()
 
-    LowestLow = Data[LowColumn].rolling(window=14, min_periods=1).min()
-    HighestHigh = Data[HighColumn].rolling(window=14, min_periods=1).max()
-    Range = HighestHigh - LowestLow
-    Range[Range == 0] = 1
-    Data["STOCH"] = 100 * (Data[CloseColumn] - LowestLow) / Range
-
-    PriceDiff = Data[CloseColumn].diff()
-    Direction = PriceDiff.apply(lambda Value: 1 if Value > 0 else -1 if Value < 0 else 0)
-    Data["OBV"] = (Direction * Data[VolumeColumn]).cumsum()
+    Data["MA20"] = ta.sma(Data[CloseColumn], length=20)
+    Data["MA50"] = ta.sma(Data[CloseColumn], length=50)
+    Data["RSI"] = ta.rsi(Data[CloseColumn], length=14)
+    Data["ATR14"] = ta.atr(Data[HighColumn], Data[LowColumn], Data[CloseColumn], length=14)
+    Stoch = ta.stoch(Data[HighColumn], Data[LowColumn], Data[CloseColumn], k=14)
+    Data["STOCH"] = Stoch.iloc[:, 0] if isinstance(Stoch, pd.DataFrame) else Stoch
+    Data["OBV"] = ta.obv(Data[CloseColumn], Data[VolumeColumn])
     return Data
