@@ -26,10 +26,21 @@ In our case:
 
 ## Features
 
-- 📊 **Real-time market data processing**
-- 🧠 **HMM model training and prediction**
-- 📈 **Visualization of market states and predictions**
-- 📈 **Technical indicators including Moving Averages, RSI, ATR, Stochastic and OBV**
-- 📱 **Easy-to-use interface**
-- 🔄 **Automatic model retraining**
-- 📊 **Performance metrics and backtesting**
+- 📥 **Downloads historical price data from Yahoo Finance**
+- 🗮 **Generates technical indicators (MA20, MA50, RSI, ATR14, Stochastic, OBV)**
+- 📈 **Standardizes observations before modeling**
+- 🧠 **Trains a Gaussian HMM to classify market regimes**
+- 🎯 **Predicts regimes as Uptrend, Downtrend or Sideway**
+- ✅ **Evaluates prediction accuracy over a lookahead period**
+- 🧘 **Main script to run the full pipeline**
+
+## Usage
+
+Run the main script from the repository root:
+
+```bash
+python main.py
+```
+
+The script downloads Apple trading data, fits the HMM and prints prediction accuracy. The returned `DataFrame` includes the calculated indicators, daily returns and regime label for each record.
+
