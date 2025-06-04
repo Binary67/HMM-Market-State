@@ -1,6 +1,16 @@
+import numpy as np
 import pandas as pd
-import pandas_ta as ta
 import yfinance as yf
+
+
+def EnsurePandasTaCompatibility() -> None:
+    """Ensure pandas-ta works with newer NumPy versions."""
+    if not hasattr(np, "NaN"):
+        np.NaN = np.nan
+
+
+EnsurePandasTaCompatibility()
+import pandas_ta as ta
 
 
 
