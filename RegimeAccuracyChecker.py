@@ -22,3 +22,27 @@ class RegimeAccuracyChecker:
         if TotalCount <= 0:
             return 0.0
         return CorrectCount / TotalCount
+
+    def GridSearchParameters(
+        self,
+        Data: pd.DataFrame,
+        RegimeColumn: str,
+        ReturnColumn: str,
+        LookaheadOptions: list[int],
+        ThresholdOptions: list[float],
+    ) -> tuple[int, float]:
+        """Return the LookaheadDays and SidewayThreshold yielding the best accuracy."""
+        BestLookahead = self.LookaheadDays
+        BestThreshold = self.SidewayThreshold
+        BestAccuracy = -1.0
+        for Lookahead in LookaheadOptions:
+            for Threshold in ThresholdOptions:
+                Checker = RegimeAccuracyChecker(Lookahead, Threshold)
+                Accuracy = Checker.CalculateAccuracy(Data, RegimeColumn, ReturnColumn)
+                if Accuracy > BestAccuracy:
+                    BestAccuracy = Accuracy
+                    BestLookahead = Lookahead
+                    BestThreshold = Threshold
+        self.LookaheadDays = BestLookahead
+        self.SidewayThreshold = BestThreshold
+        return BestLookahead, BestThreshold
