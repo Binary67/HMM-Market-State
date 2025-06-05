@@ -14,6 +14,11 @@ class HiddenMarkovModel:
 
     def Fit(self, Data: pd.DataFrame, FeatureColumns: List[str]) -> None:
         CleanData = Data.dropna(subset=FeatureColumns)
+        if CleanData.empty:
+            raise ValueError(
+                "No data available to train the HMM. "
+                "Please ensure your dataset has sufficient rows without missing values for all features."
+            )
         TrainingMatrix = CleanData[FeatureColumns].values
         self.Model.fit(TrainingMatrix)
         self.TrainingIndex = CleanData.index

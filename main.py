@@ -7,7 +7,7 @@ import numpy as np
 def Main() -> None:
     Data = DownloadTradingData(
         "AAPL",
-        "2024-01-01",
+        "2023-10-01",
         "2024-01-15",
         "1d",
     )
