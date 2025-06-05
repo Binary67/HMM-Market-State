@@ -4,10 +4,12 @@ import pandas as pd
 
 class RegimeStrategy(Strategy):
     TrailingTakeProfit = 0.05
+    RiskPercent = 0.05
 
     def init(self):
         self.HighPrice = None
         self.LowPrice = None
+        self.InitialCapital = self.equity
 
     def next(self):
         close = self.data.Close[-1]
@@ -39,14 +41,24 @@ class RegimeStrategy(Strategy):
             if not self.position.is_long:
                 if self.position:
                     self.position.close()
-                self.buy()
+                RiskCapital = self.InitialCapital * self.RiskPercent
+                RiskPerUnit = close * self.TrailingTakeProfit
+                Size = int(RiskCapital / RiskPerUnit) if RiskPerUnit else 0
+                Size = min(Size, int(self.equity / close))
+                Size = max(Size, 1)
+                self.buy(size=Size, sl=close * (1 - self.TrailingTakeProfit))
                 self.HighPrice = close
                 self.LowPrice = None
         elif regime == "Downtrend":
             if not self.position.is_short:
                 if self.position:
                     self.position.close()
-                self.sell()
+                RiskCapital = self.InitialCapital * self.RiskPercent
+                RiskPerUnit = close * self.TrailingTakeProfit
+                Size = int(RiskCapital / RiskPerUnit) if RiskPerUnit else 0
+                Size = min(Size, int(self.equity / close))
+                Size = max(Size, 1)
+                self.sell(size=Size, sl=close * (1 + self.TrailingTakeProfit))
                 self.LowPrice = close
                 self.HighPrice = None
         else:  # Sideway
@@ -56,7 +68,11 @@ class RegimeStrategy(Strategy):
                 self.LowPrice = None
 
 
-def RunBacktest(Data: pd.DataFrame, TrailingTakeProfit: float = 0.05) -> pd.DataFrame:
+def RunBacktest(
+    Data: pd.DataFrame,
+    TrailingTakeProfit: float = 0.05,
+    RiskPercent: float = 0.05,
+) -> pd.DataFrame:
     RequiredColumns = {"Open", "High", "Low", "Close", "Regime"}
     MissingCols = RequiredColumns - set(Data.columns)
     if MissingCols:
@@ -64,5 +80,5 @@ def RunBacktest(Data: pd.DataFrame, TrailingTakeProfit: float = 0.05) -> pd.Data
 
     CleanData = Data.dropna(subset=["Close", "Regime"])
     bt = Backtest(CleanData, RegimeStrategy, cash=10000, commission=0.0)
-    stats = bt.run(TrailingTakeProfit=TrailingTakeProfit)
+    stats = bt.run(TrailingTakeProfit=TrailingTakeProfit, RiskPercent=RiskPercent)
     return stats
