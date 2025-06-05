@@ -28,9 +28,17 @@ def Main() -> None:
     )
 
     Data["LogReturn"] = np.log(Data["Close"]).diff()
+
+    OriginalColumns = ["Open", "High", "Low", "Close", "Volume"]
+    TechnicalFeatureColumns = [
+        Column
+        for Column in Data.columns
+        if Column not in OriginalColumns
+    ]
+
     Hmm = HiddenMarkovModel()
-    Hmm.Fit(Data, ["LogReturn"])
-    Data = Hmm.PredictRegime(Data, ["LogReturn"])
+    Hmm.Fit(Data, TechnicalFeatureColumns)
+    Data = Hmm.PredictRegime(Data, TechnicalFeatureColumns)
     print(Data.tail())
 
 
