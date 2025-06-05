@@ -1,6 +1,7 @@
 from DataDownloader import DownloadTradingData
 from FeatureEngineering import FeatureEngineering
 from HiddenMarkovModel import HiddenMarkovModel
+from BacktestingModule import RunBacktest
 import numpy as np
 
 
@@ -40,6 +41,9 @@ def Main() -> None:
     Hmm.Fit(Data, TechnicalFeatureColumns)
     Data = Hmm.PredictRegime(Data, TechnicalFeatureColumns)
     print(Data.tail())
+
+    Stats = RunBacktest(Data)
+    print("Backtest statistics:\n", Stats)
 
 
 if __name__ == "__main__":
