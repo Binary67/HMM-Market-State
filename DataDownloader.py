@@ -17,4 +17,5 @@ def DownloadTradingData(TickerSymbol: str, StartDate: str, EndDate: str, Interva
 
     OhlcvColumns = ["Open", "High", "Low", "Close", "Volume"]
     Data = Data.loc[:, Data.columns.get_level_values(1).isin(OhlcvColumns)]
+    Data.columns = Data.columns.droplevel(0)
     return Data
