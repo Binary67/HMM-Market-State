@@ -42,7 +42,7 @@ def Main() -> None:
     Data = Hmm.PredictRegime(Data, TechnicalFeatureColumns)
     print(Data.tail())
 
-    Stats = RunBacktest(Data)
+    Stats = RunBacktest(Data, TrailingTakeProfit=0.05)
     print("Backtest statistics:\n", Stats)
 
 
