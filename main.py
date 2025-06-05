@@ -39,6 +39,8 @@ def Main() -> None:
 
     Hmm = HiddenMarkovModel()
     Hmm.Fit(Data, TechnicalFeatureColumns)
+    TransitionMatrix = Hmm.GetTransitionProbabilities()
+    print("Transition probabilities:\n", TransitionMatrix)
     Data = Hmm.PredictRegime(Data, TechnicalFeatureColumns)
 
     Stats = RunBacktest(Data, TrailingTakeProfit=0.03, RiskPercent=0.05)
