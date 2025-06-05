@@ -8,8 +8,8 @@ import numpy as np
 def Main() -> None:
     Data = DownloadTradingData(
         "AAPL",
-        "2023-10-01",
-        "2024-01-15",
+        "2020-01-01",
+        "2024-12-31",
         "1d",
     )
 
@@ -40,9 +40,8 @@ def Main() -> None:
     Hmm = HiddenMarkovModel()
     Hmm.Fit(Data, TechnicalFeatureColumns)
     Data = Hmm.PredictRegime(Data, TechnicalFeatureColumns)
-    print(Data.tail())
 
-    Stats = RunBacktest(Data, TrailingTakeProfit=0.05)
+    Stats = RunBacktest(Data, TrailingTakeProfit=0.03)
     print("Backtest statistics:\n", Stats)
 
 
