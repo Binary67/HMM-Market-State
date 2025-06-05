@@ -48,7 +48,7 @@ def Main() -> None:
     Stats = RunBacktest(
         Data,
         TrailingTakeProfit=0.03,
-        RiskPercent=0.05,
+        RiskPercent=0.01,
         StateProbabilityThreshold=0.6,
     )
     print("Backtest statistics:\n", Stats)
