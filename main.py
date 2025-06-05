@@ -42,8 +42,15 @@ def Main() -> None:
     TransitionMatrix = Hmm.GetTransitionProbabilities()
     print("Transition probabilities:\n", TransitionMatrix)
     Data = Hmm.PredictRegime(Data, TechnicalFeatureColumns)
+    Data["MostLikelyState"] = Data["MostLikelyState"].shift(-1)
+    Data["StateProbability"] = Data["StateProbability"].shift(-1)
 
-    Stats = RunBacktest(Data, TrailingTakeProfit=0.03, RiskPercent=0.05)
+    Stats = RunBacktest(
+        Data,
+        TrailingTakeProfit=0.03,
+        RiskPercent=0.05,
+        StateProbabilityThreshold=0.6,
+    )
     print("Backtest statistics:\n", Stats)
 
 
