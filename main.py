@@ -41,7 +41,7 @@ def Main() -> None:
     Hmm.Fit(Data, TechnicalFeatureColumns)
     Data = Hmm.PredictRegime(Data, TechnicalFeatureColumns)
 
-    Stats = RunBacktest(Data, TrailingTakeProfit=0.03)
+    Stats = RunBacktest(Data, TrailingTakeProfit=0.03, RiskPercent=0.05)
     print("Backtest statistics:\n", Stats)
 
 
