@@ -13,9 +13,12 @@ class HiddenMarkovModel:
         self.Iterations = Iterations
         self.Model = GaussianHMM(n_components=NumberOfStates, covariance_type="full", n_iter=Iterations)
         self.Scaler = StandardScaler()
+        self.StateMapping = {}
 
     def Fit(self, Data: pd.DataFrame, FeatureColumns: List[str]) -> None:
-        CleanData = Data.dropna(subset=FeatureColumns)
+        if "LogReturn" not in Data.columns:
+            raise ValueError("LogReturn column is required for fitting the HMM")
+        CleanData = Data.dropna(subset=FeatureColumns + ["LogReturn"])
         if CleanData.empty:
             raise ValueError(
                 "No data available to train the HMM. "
@@ -25,17 +28,21 @@ class HiddenMarkovModel:
         ScaledMatrix = self.Scaler.fit_transform(TrainingMatrix)
         self.Model.fit(ScaledMatrix)
         self.TrainingIndex = CleanData.index
-        self.StateOrder = np.argsort(self.Model.means_[:, 0])
+        PredictedStates = self.Model.predict(ScaledMatrix)
+        LogReturnMeans = {}
+        for State in range(self.NumberOfStates):
+            StateReturns = CleanData.loc[PredictedStates == State, "LogReturn"]
+            LogReturnMeans[State] = StateReturns.mean() if not StateReturns.empty else np.nan
+        SortedStates = sorted(LogReturnMeans.items(), key=lambda x: x[1])
+        self.StateMapping = {SortedStates[-1][0]: "Uptrend", SortedStates[0][0]: "Downtrend"}
+        for State in range(self.NumberOfStates):
+            if State not in self.StateMapping:
+                self.StateMapping[State] = "Sideway"
 
     def GetTransitionProbabilities(self) -> pd.DataFrame:
         """Return transition probability matrix as a DataFrame."""
         Matrix = self.Model.transmat_
-        Mapping = {
-            self.StateOrder[-1]: "Uptrend",
-            self.StateOrder[0]: "Downtrend",
-            self.StateOrder[1]: "Sideway",
-        }
-        Labels = [Mapping.get(i, f"State{i}") for i in range(self.NumberOfStates)]
+        Labels = [self.StateMapping.get(i, f"State{i}") for i in range(self.NumberOfStates)]
         return pd.DataFrame(Matrix, index=Labels, columns=Labels)
 
     def PredictRegime(self, Data: pd.DataFrame, FeatureColumns: List[str]) -> pd.DataFrame:
@@ -45,11 +52,7 @@ class HiddenMarkovModel:
         ScaledMatrix = self.Scaler.transform(ObservationMatrix)
         Predictions = self.Model.predict(ScaledMatrix)
         Probabilities = self.Model.predict_proba(ScaledMatrix)
-        Mapping = {
-            self.StateOrder[-1]: "Uptrend",
-            self.StateOrder[0]: "Downtrend",
-            self.StateOrder[1]: "Sideway",
-        }
+        Mapping = self.StateMapping
         RegimeSeries = pd.Series(index=CleanData.index, data=[Mapping[p] for p in Predictions])
         ResultData["Regime"] = RegimeSeries
         MostLikelyStates = Probabilities.argmax(axis=1)
