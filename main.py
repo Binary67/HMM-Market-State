@@ -2,8 +2,9 @@ from DataDownloader import DownloadTradingData
 from FeatureEngineering import FeatureEngineering
 from HiddenMarkovModel import HiddenMarkovModel
 from BacktestingModule import RunBacktest
-from ModelEvaluation import EvaluateRegimePrediction
+from ModelEvaluation import EvaluateRegimePrediction, TrackEquityCurve
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def Main() -> None:
@@ -60,6 +61,15 @@ def Main() -> None:
     Data = MarketModel.PredictRegime(Data, TechnicalFeatureColumns)
     Data["MostLikelyState"] = Data["MostLikelyState"].shift(-1)
     Data["StateProbability"] = Data["StateProbability"].shift(-1)
+
+    EquityCurve = TrackEquityCurve(Data)
+    plt.figure(figsize=(10, 6))
+    plt.plot(EquityCurve.index, EquityCurve, label="Equity")
+    plt.xlabel("Date")
+    plt.ylabel("Equity")
+    plt.title("Equity Curve")
+    plt.legend()
+    plt.show()
 
     Stats = RunBacktest(
         Data,

@@ -3,6 +3,31 @@ from typing import List, Dict
 from sklearn.metrics import accuracy_score, f1_score
 
 from HiddenMarkovModel import HiddenMarkovModel
+import numpy as np
+
+
+def TrackEquityCurve(Data: pd.DataFrame, InitialCapital: float = 10000.0) -> pd.Series:
+    """Return equity over time based on predicted market regime."""
+    RequiredColumns = {"LogReturn", "MostLikelyState"}
+    if not RequiredColumns.issubset(Data.columns):
+        raise ValueError("Data must contain LogReturn and MostLikelyState columns")
+
+    CleanData = Data.dropna(subset=["LogReturn", "MostLikelyState"])
+    EquityValues = []
+    CurrentEquity = InitialCapital
+    for _, Row in CleanData.iterrows():
+        Regime = Row["MostLikelyState"]
+        LogReturn = Row["LogReturn"]
+        if Regime == "Uptrend":
+            GrowthFactor = float(np.exp(LogReturn))
+        elif Regime == "Downtrend":
+            GrowthFactor = float(np.exp(-LogReturn))
+        else:
+            GrowthFactor = 1.0
+        CurrentEquity *= GrowthFactor
+        EquityValues.append(CurrentEquity)
+
+    return pd.Series(EquityValues, index=CleanData.index)
 
 
 def EvaluateRegimePrediction(Data: pd.DataFrame, FeatureColumns: List[str], TrainFraction: float = 0.8) -> Dict[str, float]:
