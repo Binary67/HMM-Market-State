@@ -42,8 +42,11 @@ def Main() -> None:
     TransitionMatrix = MarketModel.GetTransitionProbabilities()
     print("Transition probabilities:\n", TransitionMatrix)
     Data = MarketModel.PredictRegime(Data, TechnicalFeatureColumns)
-    Data["MostLikelyState"] = Data["MostLikelyState"].shift(-1)
-    Data["StateProbability"] = Data["StateProbability"].shift(-1)
+    Data[["Regime", "MostLikelyState", "StateProbability"]] = Data[[
+        "Regime",
+        "MostLikelyState",
+        "StateProbability",
+    ]].shift(-1)
 
     Stats = RunBacktest(
         Data,

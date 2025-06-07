@@ -25,7 +25,11 @@ class HiddenMarkovModel:
         ScaledMatrix = self.Scaler.fit_transform(TrainingMatrix)
         self.Model.fit(ScaledMatrix)
         self.TrainingIndex = CleanData.index
-        self.StateOrder = np.argsort(self.Model.means_[:, 0])
+        if "LogReturn" in FeatureColumns:
+            LogReturnIndex = FeatureColumns.index("LogReturn")
+        else:
+            LogReturnIndex = 0
+        self.StateOrder = np.argsort(self.Model.means_[:, LogReturnIndex])
 
     def GetTransitionProbabilities(self) -> pd.DataFrame:
         """Return transition probability matrix as a DataFrame."""
