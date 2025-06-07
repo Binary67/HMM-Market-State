@@ -37,11 +37,11 @@ def Main() -> None:
         if Column not in OriginalColumns
     ]
 
-    Hmm = HiddenMarkovModel()
-    Hmm.Fit(Data, TechnicalFeatureColumns)
-    TransitionMatrix = Hmm.GetTransitionProbabilities()
+    MarketModel = HiddenMarkovModel()
+    MarketModel.Fit(Data, TechnicalFeatureColumns)
+    TransitionMatrix = MarketModel.GetTransitionProbabilities()
     print("Transition probabilities:\n", TransitionMatrix)
-    Data = Hmm.PredictRegime(Data, TechnicalFeatureColumns)
+    Data = MarketModel.PredictRegime(Data, TechnicalFeatureColumns)
     Data["MostLikelyState"] = Data["MostLikelyState"].shift(-1)
     Data["StateProbability"] = Data["StateProbability"].shift(-1)
 
