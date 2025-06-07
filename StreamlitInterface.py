@@ -10,6 +10,15 @@ from ModelEvaluation import EvaluateRegimePrediction
 from BacktestingModule import RunBacktest
 
 
+def FormatBacktestStats(Stats: pd.Series) -> pd.DataFrame:
+    """Convert stats to a DataFrame friendly for Streamlit display."""
+    StatsFrame = Stats.to_frame(name="Value")
+    StatsFrame["Value"] = StatsFrame["Value"].apply(
+        lambda X: str(X) if isinstance(X, pd.Timedelta) else X
+    )
+    return StatsFrame
+
+
 def RunAnalysis(
     Ticker: str,
     StartDate: str,
@@ -96,7 +105,8 @@ def DisplayInterface() -> None:
         st.subheader("Validation Metrics")
         st.json(Metrics)
         st.subheader("Backtest Performance")
-        st.write(Stats.to_frame())
+        FormattedStats = FormatBacktestStats(Stats)
+        st.write(FormattedStats)
         EquityCurve = Stats._equity_curve
         st.subheader("Equity Curve")
         st.line_chart(EquityCurve["Equity"])
