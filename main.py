@@ -2,7 +2,7 @@ from StreamlitInterface import DisplayInterface
 
 
 def Main() -> None:
-    """Launch the Streamlit interface."""
+    """Launch the Streamlit interface with labeled charts."""
     DisplayInterface()
 
 

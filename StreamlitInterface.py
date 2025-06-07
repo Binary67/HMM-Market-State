@@ -98,7 +98,9 @@ def DisplayInterface() -> None:
         st.subheader("Backtest Performance")
         st.write(Stats.to_frame())
         EquityCurve = Stats._equity_curve
+        st.subheader("Equity Curve")
         st.line_chart(EquityCurve["Equity"])
+        st.subheader("Closing Price")
         st.line_chart(Data["Close"])  # Price chart
 
 
