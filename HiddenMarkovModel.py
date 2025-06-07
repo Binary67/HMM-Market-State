@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from hmmlearn.hmm import GaussianHMM
+from sklearn.preprocessing import StandardScaler
 from typing import List
 
 
@@ -11,6 +12,7 @@ class HiddenMarkovModel:
         self.NumberOfStates = NumberOfStates
         self.Iterations = Iterations
         self.Model = GaussianHMM(n_components=NumberOfStates, covariance_type="full", n_iter=Iterations)
+        self.Scaler = StandardScaler()
 
     def Fit(self, Data: pd.DataFrame, FeatureColumns: List[str]) -> None:
         CleanData = Data.dropna(subset=FeatureColumns)
@@ -20,7 +22,8 @@ class HiddenMarkovModel:
                 "Please ensure your dataset has sufficient rows without missing values for all features."
             )
         TrainingMatrix = CleanData[FeatureColumns].values
-        self.Model.fit(TrainingMatrix)
+        ScaledMatrix = self.Scaler.fit_transform(TrainingMatrix)
+        self.Model.fit(ScaledMatrix)
         self.TrainingIndex = CleanData.index
         self.StateOrder = np.argsort(self.Model.means_[:, 0])
 
@@ -39,8 +42,9 @@ class HiddenMarkovModel:
         ResultData = Data.copy()
         CleanData = ResultData.dropna(subset=FeatureColumns)
         ObservationMatrix = CleanData[FeatureColumns].values
-        Predictions = self.Model.predict(ObservationMatrix)
-        Probabilities = self.Model.predict_proba(ObservationMatrix)
+        ScaledMatrix = self.Scaler.transform(ObservationMatrix)
+        Predictions = self.Model.predict(ScaledMatrix)
+        Probabilities = self.Model.predict_proba(ScaledMatrix)
         Mapping = {
             self.StateOrder[-1]: "Uptrend",
             self.StateOrder[0]: "Downtrend",
