@@ -2,6 +2,7 @@ from DataDownloader import DownloadTradingData
 from FeatureEngineering import FeatureEngineering
 from HiddenMarkovModel import HiddenMarkovModel
 from BacktestingModule import RunBacktest
+from ModelEvaluation import EvaluateRegimePrediction
 import numpy as np
 
 
@@ -51,6 +52,8 @@ def Main() -> None:
 
     MarketModel = HiddenMarkovModel()
     MarketModel.Fit(Data, TechnicalFeatureColumns)
+    Metrics = EvaluateRegimePrediction(Data, TechnicalFeatureColumns)
+    print("Validation metrics:", Metrics)
     TransitionMatrix = MarketModel.GetTransitionProbabilities()
     print("Transition probabilities:\n", TransitionMatrix)
     print("State mapping:", MarketModel.StateMapping)
