@@ -1,34 +1,41 @@
 # HMM Market State Predictor
 
-A machine learning project that uses Hidden Markov Models (HMM) to predict market states: **Bullish** 📈, **Bearish** 📉, or **Sideways** ➡️.
+This project analyzes historical market data using a Gaussian Hidden Markov Model (HMM) to classify market regimes as **Uptrend**, **Downtrend**, or **Sideway**. It provides utilities to engineer technical indicators, evaluate predictions and backtest a simple trading strategy.
 
-## What is This Project?
+## Overview
 
-Think of the stock market like weather patterns. Just like how today's weather gives us clues about tomorrow's weather, today's market behavior can help us predict tomorrow's market state. This project uses a mathematical model called Hidden Markov Model to find these hidden patterns and make predictions.
+1. `DataDownloader.py` retrieves OHLCV data from Yahoo Finance.
+2. `FeatureEngineering.py` adds a set of technical indicators.
+3. `HiddenMarkovModel.py` fits and applies the HMM.
+4. `ModelEvaluation.py` computes basic validation metrics.
+5. `BacktestingModule.py` simulates a regime-based strategy.
+6. `StreamlitInterface.py` exposes the pipeline through an interactive dashboard.
 
-### Simple Example
-- If the market has been going up for several days with high volume → Likely to continue **Bullish**
-- If there's been a lot of selling pressure with declining prices → Might turn **Bearish**  
-- If prices have been moving in a narrow range → Could stay **Sideways**
+## Requirements
 
-## How Hidden Markov Models Work (Simplified)
+- Python 3.10+
+- `pandas`, `numpy`, `yfinance`, `hmmlearn`, `scikit-learn`, `backtesting`, `streamlit`
 
-Imagine you're in a room with someone flipping coins, but you can't see the coins - only hear the results. However, you know there are two different coins:
-- **Fair coin**: 50% heads, 50% tails
-- **Biased coin**: 80% heads, 20% tails
+Install dependencies with:
 
-By listening to the sequence of results (heads, tails, heads, heads...), you can guess which coin is being used and predict the next flip. That's exactly what HMM does with market data!
+```bash
+pip install pandas numpy yfinance hmmlearn scikit-learn backtesting streamlit
+```
 
-In our case:
-- **Hidden states**: Market conditions (Bullish, Bearish, Sideways)
-- **Observable data**: Price changes, volume, technical indicators
-- **Prediction**: What market state comes next
+## Usage
+
+Run the Streamlit interface to download data, train the model and execute a backtest:
+
+```bash
+python main.py
+```
+
+A browser window will open allowing you to choose the ticker, date range and backtest parameters.
 
 ## Features
 
-- 📊 **Real-time market data processing**
-- 🧠 **HMM model training and prediction**
-- 📈 **Visualization of market states and predictions**
-- 📱 **Easy-to-use interface**
-- 🔄 **Automatic model retraining**
-- 📊 **Performance metrics and backtesting**
+- Historical data download from Yahoo Finance
+- Modular technical indicator computation
+- Hidden Markov Model for regime detection
+- Backtesting with risk management and trailing stops
+- Interactive dashboard for visualization and metrics
