@@ -17,7 +17,10 @@ class FeatureEngineering:
             "MACD": self._CalculateMovingAverageConvergenceDivergence,
             "BollingerBands": self._CalculateBollingerBands,
             "ATR": self._CalculateAverageTrueRange,
-            "Stochastic": self._CalculateStochasticOscillator
+            "Stochastic": self._CalculateStochasticOscillator,
+            "OnBalanceVolume": self._CalculateOnBalanceVolume,
+            "WilliamsPercentR": self._CalculateWilliamsPercentR,
+            "CommodityChannelIndex": self._CalculateCommodityChannelIndex,
         }
     
     def ApplyTechnicalAnalysis(self, Data: pd.DataFrame, IndicatorsToApply: List[str], 
@@ -126,4 +129,31 @@ class FeatureEngineering:
         
         Data[f"Stoch_K_{KPeriod}"] = 100 * ((Data["Close"] - LowestLow) / (HighestHigh - LowestLow))
         Data[f"Stoch_D_{DPeriod}"] = Data[f"Stoch_K_{KPeriod}"].rolling(window=DPeriod).mean()
+        return Data
+
+    def _CalculateOnBalanceVolume(self, Data: pd.DataFrame) -> pd.DataFrame:
+        """Calculate On-Balance Volume."""
+        CloseDelta = Data["Close"].diff()
+        Direction = np.sign(CloseDelta).fillna(0)
+        VolumeAdj = Direction * Data["Volume"]
+        Data["OnBalanceVolume"] = VolumeAdj.cumsum().fillna(method="ffill")
+        return Data
+
+    def _CalculateWilliamsPercentR(self, Data: pd.DataFrame, Window: int = 14) -> pd.DataFrame:
+        """Calculate Williams %R."""
+        HighestHigh = Data["High"].rolling(window=Window).max()
+        LowestLow = Data["Low"].rolling(window=Window).min()
+        Data[f"WilliamsR_{Window}"] = -100 * (
+            (HighestHigh - Data["Close"]) / (HighestHigh - LowestLow)
+        )
+        return Data
+
+    def _CalculateCommodityChannelIndex(self, Data: pd.DataFrame, Window: int = 20) -> pd.DataFrame:
+        """Calculate Commodity Channel Index."""
+        TypicalPrice = (Data["High"] + Data["Low"] + Data["Close"]) / 3
+        MovingAverage = TypicalPrice.rolling(window=Window).mean()
+        MeanDeviation = TypicalPrice.rolling(window=Window).apply(
+            lambda x: np.mean(np.abs(x - x.mean())), raw=True
+        )
+        Data[f"CCI_{Window}"] = (TypicalPrice - MovingAverage) / (0.015 * MeanDeviation)
         return Data
